@@ -42,7 +42,7 @@ Clone the project
 Go to the project directory
 
 ```bash
-  cd vehicle-allocation-api
+  cd Vehicle-Allocation-System
 ```
 
 # For Windows
