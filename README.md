@@ -11,15 +11,15 @@ A brief description of what this project does and who it's for
 
 ## Features
 
-- **Vehicle Management:**
-  - Create, update, and delete vehicle records.
-  - Ensure unique vehicle IDs and plate numbers using MongoDB indexes.
-  - Retrieve detailed information about each vehicle.
-  
 - **Employee Management:**
   - Add, update, and remove employee records.
   - Ensure unique employee IDs through MongoDB indexes.
   - Retrieve detailed information about each employee.
+
+- **Vehicle Management:**
+  - Create, update, and delete vehicle records.
+  - Ensure unique vehicle IDs and plate numbers using MongoDB indexes.
+  - Retrieve detailed information about each vehicle.
   
 - **Vehicle Allocation:**
   - Allocate vehicles to employees for specific dates.
