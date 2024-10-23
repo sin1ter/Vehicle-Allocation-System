@@ -33,7 +33,7 @@ A brief description of what this project does and who it's for
   - Generate reports based on allocation history with customizable filters for better data insights.
 
 - **Expired Allocated Vehicle Cleanup:**
-  - Added a extra feature which will automatically delete the vehicle allocations after 30 days so that the vehicle can be allocated to the another employee.
+  - Added a feature which will automatically delete the vehicle allocations after 30 days so that the vehicle can be allocated to the another employee.
 
 
 ## Run Locally
