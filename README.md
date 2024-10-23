@@ -30,8 +30,8 @@ A brief description of what this project does and who it's for
   
 - **Allocation History:**
   - Track vehicle allocation history, storing past allocations for reporting purposes.
-  - Generate reports based on allocation history with customizable filters for better data insights.
-
+  - Generate reports based on allocation history.
+  
 - **Expired Allocated Vehicle Cleanup:**
   - Added a feature which will automatically delete the vehicle allocations after 30 days so that the vehicle can be allocated to the another employee.
 
