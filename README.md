@@ -113,7 +113,8 @@ Start the server
 #### Vehicle Allocation History Endpoints:
 | HTTP | Endpoints | Action |
 | --- | --- | --- |
-| **GET** | `/api/allocation-history` | To retrieve all allocation history |
+  **GET** | `/api/allocation-history` | To retrieve the allocation history which are presently allocated |
+| **GET** | `/api/old-allocation-history` | To retrieve all the allocation history which were many before |
 
 
 ## Author

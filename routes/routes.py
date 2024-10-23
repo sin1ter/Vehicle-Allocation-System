@@ -20,7 +20,7 @@ router = APIRouter()
 
 ######### Employee Endpoints #######
 # List employees
-@router.get("/employees", tags=["Employees"], summary="Get All Employees",)
+@router.get("/api/employees", tags=["Employees"], summary="Get All Employees",)
 async def get_employees():
     """
     Retrieve a list of all employees in the system.
@@ -36,7 +36,7 @@ async def get_employees():
         raise HTTPException(status_code=500, detail=str(e))
 
 # Get a specific employee by ID
-@router.get("/employees/{id}", tags=["Employees"], summary="Get Employee by ID")
+@router.get("/api/employees/{id}", tags=["Employees"], summary="Get Employee by ID")
 async def get_employee(id:str):
     """
     Retrieve an employee's information by their unique ID.
@@ -58,7 +58,7 @@ async def get_employee(id:str):
     return employee
 
 # Create a new employee
-@router.post("/employees", tags=["Employees"], summary="Create an Employee")
+@router.post("/api/employees", tags=["Employees"], summary="Create an Employee")
 async def create_employee(employee:EmployeeInformation):
     """
     Create a new employee record.
@@ -78,7 +78,7 @@ async def create_employee(employee:EmployeeInformation):
         )
 
 # Update an employee's details
-@router.put("/employee/{id}", tags=["Employees"], summary="Update Employee Information")
+@router.put("/api/employee/{id}", tags=["Employees"], summary="Update Employee Information")
 async def update_employee(id:str, employee:EmployeeInformation):
     """
     Update an existing employee's information by their ID.
@@ -98,7 +98,7 @@ async def update_employee(id:str, employee:EmployeeInformation):
     return {"message" : "Employee updated succesfully"}
 
 # Delete an employee by ID
-@router.delete("/employee/{id}", tags=["Employees"], summary="Delete Employee Information")
+@router.delete("/api/employee/{id}", tags=["Employees"], summary="Delete Employee Information")
 async def delete_employee(id: str):
     """
     Delete an employee record by their unique ID.
@@ -124,7 +124,7 @@ async def delete_employee(id: str):
 ######### Vehicle Endpoints #######
 
 # List of Vehicles
-@router.get("/vehicles", tags=["Vehicles"], summary="Get All Vehicles")
+@router.get("/api/vehicles", tags=["Vehicles"], summary="Get All Vehicles")
 async def get_vehicles():
     """
     Retrieve a list of all vehicles in the system.
@@ -140,7 +140,7 @@ async def get_vehicles():
         raise HTTPException(status_code=500, detail=str(e))
 
 # Get a specific vehicle by ID
-@router.get("/vehicle/{id}", tags=["Vehicles"], summary="Get Vehicle by ID")
+@router.get("/api/vehicle/{id}", tags=["Vehicles"], summary="Get Vehicle by ID")
 async def get_vehicle(id:str):
     """
     Retrieve a vehicle by its unique ID.
@@ -166,7 +166,7 @@ async def get_vehicle(id:str):
 
 
 # Create a new vehicle
-@router.post("/vehicle", tags=["Vehicles"], summary="Create a Vehicle")
+@router.post("/api/vehicle", tags=["Vehicles"], summary="Create a Vehicle")
 async def post_vehicle(vehicle: VehicleInformation):
     """
     Add a new vehicle to the system.
@@ -187,7 +187,7 @@ async def post_vehicle(vehicle: VehicleInformation):
         )
 
 # Update an existing vehicle's information
-@router.put("/vehicle-update/{id}", tags=["Vehicles"], summary="Update Vehicle Information")
+@router.put("/api/vehicle-update/{id}", tags=["Vehicles"], summary="Update Vehicle Information")
 async def put_vehicle(id: str, vehicle:VehicleInformation):
     """
     Update an existing vehicle's information.
@@ -208,7 +208,7 @@ async def put_vehicle(id: str, vehicle:VehicleInformation):
     return {"message" : "Vehicle updated succesfully"}
 
 # Delete a vehicle by ID
-@router.delete("/vehicle-delete/{id}", tags=["Vehicles"], summary="Delete Vehicle Information")
+@router.delete("/api/vehicle-delete/{id}", tags=["Vehicles"], summary="Delete Vehicle Information")
 async def delete_vehicle(id:str):
     """
     Delete a vehicle from the system by its ID.
@@ -230,7 +230,7 @@ async def delete_vehicle(id:str):
 ######### Vehicle Allocation Endpoints #######
 
 # Vehicle Allocations
-@router.get("/allocations", tags=["Vehicle Allocations"])
+@router.get("/api/allocations", tags=["Vehicle Allocations"])
 async def get_allocations():
     """
     Retrieve a list of all vehicle allocations.
@@ -267,7 +267,7 @@ async def get_allocations():
         raise HTTPException(status_code=500, detail=str(e))
 
 # Get a specific allocation by ID
-@router.post("/allocate_vehicle", tags=["Vehicle Allocations"])
+@router.post("/api/allocate_vehicle", tags=["Vehicle Allocations"])
 async def allocate_vehicle(allocation: VehicleAllocation):
     """
     Allocate a vehicle to an employee.
@@ -383,7 +383,7 @@ async def allocate_vehicle(allocation: VehicleAllocation):
         )
 
 # Update an existing allocation by ID
-@router.put("/update-allocate-vehicle/{id}", tags=["Vehicle Allocations"])
+@router.put("/api/update-allocate-vehicle/{id}", tags=["Vehicle Allocations"])
 async def update_allocate_vehicle(id: str, allocation: VehicleAllocation):
     """
     Update an existing vehicle allocation.
@@ -440,7 +440,7 @@ async def update_allocate_vehicle(id: str, allocation: VehicleAllocation):
         )
 
 # Delete an existing allocation by ID
-@router.delete("/delete-allocate-vehicle/{id}", tags=["Vehicle Allocations"])
+@router.delete("/api/delete-allocate-vehicle/{id}", tags=["Vehicle Allocations"])
 async def delete_allocate_vehicle(id:str, allocation: VehicleAllocation):
     """
     Delete a vehicle allocation record.
@@ -533,7 +533,7 @@ scheduler.start()
 ######### Vehicle Allocation History Endpoints #######
 
 # Retreve the history of a specific vehicle allocation
-@router.get("/allocation-history/", tags=["Allocations History"])
+@router.get("/api/allocation-history/", tags=["Allocations History"])
 async def get_allocation_history():
     """
     Retrieve all vehicle allocations with status 'allocated'.
@@ -565,7 +565,7 @@ async def get_allocation_history():
 
 
 # Retrieve the history of a specific vehicle allocation from previous
-@router.get("/old-allocation-history/", tags=["Allocations History"])
+@router.get("/api/old-allocation-history/", tags=["Allocations History"])
 async def get_old_allocation_history():
     """
     Retrieve the history of all vehicle allocations.
