@@ -1,5 +1,11 @@
 from fastapi import APIRouter, HTTPException
-from datetime import datetime, date, time
+from datetime import datetime, date, time, timedelta
+from apscheduler.schedulers.background import BackgroundScheduler
+
+from bson import ObjectId
+
+from pymongo.errors import DuplicateKeyError
+
 from models.vehicleallocation import EmployeeInformation, VehicleInformation, VehicleAllocation, VehicleAllocationHistory, AllocationStatus
 from config.database import (
     employee_collection, vehicle_collection, 
@@ -9,13 +15,10 @@ from schema.schemas import (
     list_employees, list_vehicles, 
     list_allocations, list_allocation_history
     )
-from bson import ObjectId
-
-
-from pymongo.errors import DuplicateKeyError
 
 router = APIRouter()
 
+######### Employee Endpoints #######
 # List employees
 @router.get("/employees", tags=["Employees"], summary="Get All Employees",)
 async def get_employees():
@@ -117,6 +120,9 @@ async def delete_employee(id: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
+######### Vehicle Endpoints #######
+
 # List of Vehicles
 @router.get("/vehicles", tags=["Vehicles"], summary="Get All Vehicles")
 async def get_vehicles():
@@ -157,6 +163,7 @@ async def get_vehicle(id:str):
     
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
 
 # Create a new vehicle
 @router.post("/vehicle", tags=["Vehicles"], summary="Create a Vehicle")
@@ -211,10 +218,16 @@ async def delete_vehicle(id:str):
 
     - **Returns**: A success message upon successful deletion of the vehicle.
     """
-    result = vehicle_collection.delete_one({"_id": ObjectId(id)})
-    if result.deleted_count == 0:
-        raise HTTPException(status_code=404, detail="Vehicle not found")
-    return {"message": "Vehicle deleted successfully"}
+    try:
+        result = vehicle_collection.delete_one({"_id": ObjectId(id)})
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Vehicle not found")
+        return {"message": "Vehicle deleted successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+######### Vehicle Allocation Endpoints #######
 
 # Vehicle Allocations
 @router.get("/allocations", tags=["Vehicle Allocations"])
@@ -245,10 +258,13 @@ async def get_allocations():
                 "message": "No vehicle allocations found."
             }
     """
-    allocations = list_allocations(vehicle_allocation_collection.find())
-    if not allocations:
-        return {"message": "No vehicle allocations found."}
-    return allocations
+    try:
+        allocations = list_allocations(vehicle_allocation_collection.find())
+        if not allocations:
+            return {"message": "No vehicle allocations found."}
+        return allocations
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 # Get a specific allocation by ID
 @router.post("/allocate_vehicle", tags=["Vehicle Allocations"])
@@ -334,7 +350,12 @@ async def allocate_vehicle(allocation: VehicleAllocation):
             )
         
         # Insert the allocation
-        allocation_data = dict(allocation)
+        allocation_data = {
+            "employee_id" : allocation.employee_id,
+            "vehicle_id" : allocation.vehicle_id,
+            "status" : AllocationStatus.allocated.value,
+            "allocation_date" : allocation.allocation_date,
+        }
         vehicle_allocation_collection.insert_one(allocation_data)
         
         # Create a history record for this allocation
@@ -350,7 +371,7 @@ async def allocate_vehicle(allocation: VehicleAllocation):
         if isinstance(history_entry_data["allocation_date"], date):
             history_entry_data["allocation_date"] = datetime.combine(history_entry_data["allocation_date"], time.min)
         
-        # Save the history record to the history collection
+        # # Save the history record to the history collection
         vehicle_allocation_history_collection.insert_one(history_entry_data)
         
         return {"message": "Vehicle allocation successful"}
@@ -486,10 +507,66 @@ async def delete_allocate_vehicle(id:str, allocation: VehicleAllocation):
             status_code=500,
             detail=str(e)
         )
+    
 
-# Retrieve the history of a specific vehicle allocation
+""" 
+This block of code checks either a vehicle allocation passed over 1 month
+if it is passed then it will delete it
+"""
+scheduler = BackgroundScheduler()
+
+def expired_allocation():
+    """
+    Deletes allocations that have are over one manth duration.
+    """
+    two_minutes_ago = datetime.combine(date.today(), time.min) - timedelta(days=30)
+    result = vehicle_allocation_collection.delete_many({
+        "allocation_date": {"$lt": two_minutes_ago}
+    })
+    print(f"Expired allocations cleaned up: {result.deleted_count} records deleted")
+
+scheduler.add_job(expired_allocation, 'interval', days=30)
+scheduler.start()
+
+
+
+######### Vehicle Allocation History Endpoints #######
+
+# Retreve the history of a specific vehicle allocation
 @router.get("/allocation-history/", tags=["Allocations History"])
 async def get_allocation_history():
+    """
+    Retrieve all vehicle allocations with status 'allocated'.
+
+    This endpoint returns a list of all vehicle allocations where the status is 'allocated'.
+
+    - **Returns**:
+        - **200 OK**: A list of allocations.
+        - **404 Not Found**: If no allocations with 'allocated' status are found.
+    """
+    # Fetch allocations where the status is 'allocated'
+    allocated_allocations = vehicle_allocation_collection.find({"status": "allocated"})
+    
+    # Serialize the allocations into a list
+    try:
+        result = list_allocations(allocated_allocations)
+        
+        # Check if the result is empty and return an appropriate message
+        if not result:
+            raise HTTPException(status_code=404, detail="No vehicle allocations.")
+        
+        return result
+        
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=str(e)
+        )
+
+
+# Retrieve the history of a specific vehicle allocation from previous
+@router.get("/old-allocation-history/", tags=["Allocations History"])
+async def get_old_allocation_history():
     """
     Retrieve the history of all vehicle allocations.
 

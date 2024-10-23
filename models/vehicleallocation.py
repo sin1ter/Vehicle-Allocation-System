@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from enum import Enum
 from datetime import date
-
+from typing import Optional
 
 # Employee Model
 class EmployeeInformation(BaseModel):
@@ -18,14 +18,15 @@ class VehicleInformation(BaseModel):
     color: str
 
 # Vehicle Allocation Model
-class VehicleAllocation(BaseModel):
-    employee_id: str
-    vehicle_id: str
-    allocation_date: date
-
 class AllocationStatus(str, Enum):
     allocated = "allocated",
     deallocated = "deallocated"
+
+class VehicleAllocation(BaseModel):
+    employee_id: str
+    vehicle_id: str
+    status: Optional[AllocationStatus] = AllocationStatus.allocated
+    allocation_date: date
     
 class VehicleAllocationHistory(BaseModel):
     employee_id: str
