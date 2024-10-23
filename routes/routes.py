@@ -315,6 +315,27 @@ async def allocate_vehicle(allocation: VehicleAllocation):
         - Verifies that the allocation date is not set to a past date.
     """
     try:
+        # Check if the employee id is correct
+        existing_employee = employee_collection.find_one({
+            "employee_id": allocation.employee_id
+        })
+
+        if not existing_employee:
+            raise HTTPException(
+                status_code=400,
+                detail="Choose correct employee id."
+            )
+        # Check if the vehicle id is correct
+        existing_vehicle = vehicle_collection.find_one({
+            "vehicle_id": allocation.vehicle_id
+        })
+
+        if not existing_vehicle:
+            raise HTTPException(
+                status_code=400,
+                detail="Choose correct vehicle id."
+            )
+        
         # Check if the vehicle is already allocated to this employee
         existing_vehicle_allocation = vehicle_allocation_collection.find_one({
             "vehicle_id": allocation.vehicle_id
